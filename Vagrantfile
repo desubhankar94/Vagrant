@@ -48,10 +48,10 @@ Vagrant.configure(2) do |config|
   # config.vm.synced_folder '.', '/home/'+VM_USER+'', disabled: true
 
   # Copy CA certs
-  config.vm.provision "file", source: "./certs/tls-ca-bundle.pem", destination: "/tmp/tls-ca-bundle.pem"
+  config.vm.provision "file", source: "./certs/tls-ca-bundle.pem", destination: "/tmp/tls-ca-bundle.pem", run: "once"
 
   # Setup yum repository
-  config.vm.provision "shell", inline: <<-SHELL
+  config.vm.provision "shell", inline: <<-SHELL, run: "once"
     echo "*******************"
 	# rm /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
     update-ca-trust    
@@ -67,6 +67,19 @@ Vagrant.configure(2) do |config|
 	echo "*******************"
   SHELL
 
- # Setup Script
- config.vm.provision "shell", path: "./setup_script.sh"
+  # Setup Script
+  config.vm.provision "shell", path: "./setup_script.sh", run: "once"
+ 
+  config.vm.provision "shell", inline: "date > /tmp/PROVISIONED", run: "once"
+  
+  config.vm.provision "shell", inline: <<-SHELL, run: "always"
+    echo "*************************"
+	if [ -f "/tmp/PROVISIONED" ]; then
+     date=`cat /tmp/PROVISIONED`
+	 echo "Time now :             `date`"
+	 echo "Already Provisioned on ${date}. Run 'vagrant ssh' to login."
+    fi
+	echo "*************************"
+  SHELL
+      
 end
