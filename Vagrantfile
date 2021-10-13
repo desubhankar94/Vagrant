@@ -42,26 +42,34 @@ Vagrant.configure(2) do |config|
   config.vm.network "forwarded_port", guest: 8002, host: APP2_PORT
 
   # Sync folder
-  config.vm.synced_folder HOST_PATH, GUEST_PATH
+  config.vm.synced_folder HOST_PATH, GUEST_PATH,
+  owner: "vagrant",
+  mount_options: ["dmode=755,fmode=600"]
 
   # Disable default Vagrant folder, use a unique path per project
   # config.vm.synced_folder '.', '/home/'+VM_USER+'', disabled: true
 
   # Copy CA certs
   config.vm.provision "file", source: "./certs/tls-ca-bundle.pem", destination: "/tmp/tls-ca-bundle.pem", run: "once"
+  # Copy EPEL repo file
+  config.vm.provision "file", source: "./epel.repo", destination: "/tmp/epel.repo", run: "once"
 
   # Setup yum repository
   config.vm.provision "shell", inline: <<-SHELL, run: "once"
     echo "*******************"
 	# rm /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+	yum -y install yum-utils
     update-ca-trust    
     cat /tmp/tls-ca-bundle.pem >> /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
-    yum-config-manager --disable epel
+    yum -y install epel-release
+    cat /tmp/epel.repo > /etc/yum.repos.d/epel.repo
+    yum-config-manager --enable epel
+    rm -fr /var/cache/yum/*
     yum clean all
-    yum update
+    yum update -y
     yum upgrade -y
     yum autoremove -y
-	sudo firewall-cmd --zone=public --add-port={443,8080,8001,8002}/tcp --permanent
+    sudo firewall-cmd --zone=public --add-port={443,8080,8001,8002}/tcp --permanent
 	sudo firewall-cmd --reload
 	sudo firewall-cmd --zone=public --list-all
 	echo "*******************"
