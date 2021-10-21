@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-sudo yum -y install git python3 ansible
+sudo yum -y install git python3
+python3 -m pip install --upgrade wheel pip setuptools
 
 sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 sudo yum -y install docker-ce docker-ce-cli containerd.io
