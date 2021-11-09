@@ -53,6 +53,8 @@ Vagrant.configure(2) do |config|
   config.vm.provision "file", source: "./certs/tls-ca-bundle.pem", destination: "/tmp/tls-ca-bundle.pem", run: "once"
   # Copy EPEL repo file
   config.vm.provision "file", source: "./epel.repo", destination: "/tmp/epel.repo", run: "once"
+  # Copy ansible venv requirements file
+  config.vm.provision "file", source: "./requirements.txt", destination: "/tmp/requirements.txt", run: "once"
   # Copy zcaler certs
   config.vm.provision "file", source: "./certs/zs_root.cer", destination: "/tmp/", run: "once"
   config.vm.provision "file", source: "./certs/zs_inter.cer", destination: "/tmp/", run: "once"
@@ -68,6 +70,7 @@ Vagrant.configure(2) do |config|
 	yum -y install yum-utils
 	yum -y install epel-release
     rm -fr /var/cache/yum/*
+    yum-config-manager --disable epel
     yum clean all
     yum update -y
     yum upgrade -y
