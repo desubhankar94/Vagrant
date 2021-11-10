@@ -21,6 +21,6 @@ Once Vagrant, Virtual Box and Git Bash are installed on your machine.
 3. Start gitbash and go to the Vagrantfile dir.
 4. To start the Vagrant box, run cmd --> `vagrant up && vagrant ssh`
 5. To exit from vagrant box, use cmd from inside the box --> `exit`
-6. To shutdown the vagrant box gracefully, use cmd --> `vagrant halt`
+6. To shutdown the vagrant box gracefully, use cmd after exiting the box --> `vagrant halt`
 
 #######################################################################################
